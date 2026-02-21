@@ -10,6 +10,7 @@
     "packages/utils",
     "examples",
     "examples/agui",
+    "examples/anthropic-search",
     "examples/mcp",
     "examples/react"
   ],

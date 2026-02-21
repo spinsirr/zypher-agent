@@ -30,6 +30,7 @@
     "jsr:@std/yaml@^1.0.5": "1.0.11",
     "npm:@ag-ui/core@^0.0.42": "0.0.42",
     "npm:@agentclientprotocol/sdk@0.12": "0.12.0_zod@4.3.6",
+    "npm:@anthropic-ai/sdk@0.78": "0.78.0_zod@4.3.6",
     "npm:@anthropic-ai/sdk@~0.71.2": "0.71.2_zod@4.3.6",
     "npm:@aws-sdk/client-s3@^3.974.0": "3.975.0",
     "npm:@aws-sdk/s3-request-presigner@^3.974.0": "3.975.0",
@@ -226,6 +227,17 @@
     },
     "@anthropic-ai/sdk@0.71.2_zod@4.3.6": {
       "integrity": "sha512-TGNDEUuEstk/DKu0/TflXAEt+p+p/WhTlFzEnoosvbaDU2LTjm42igSdlL0VijrKpWejtOKxX0b8A7uc+XiSAQ==",
+      "dependencies": [
+        "json-schema-to-ts",
+        "zod@4.3.6"
+      ],
+      "optionalPeers": [
+        "zod@4.3.6"
+      ],
+      "bin": true
+    },
+    "@anthropic-ai/sdk@0.78.0_zod@4.3.6": {
+      "integrity": "sha512-PzQhR715td/m1UaaN5hHXjYB8Gl2lF9UVhrrGrZeysiF6Rb74Wc9GCB8hzLdzmQtBd1qe89F9OptgB9Za1Ib5w==",
       "dependencies": [
         "json-schema-to-ts",
         "zod@4.3.6"
@@ -7196,6 +7208,14 @@
           "jsr:@std/dotenv@~0.225.6",
           "npm:@ag-ui/core@^0.0.42",
           "npm:rxjs-for-await@1",
+          "npm:zod@^4.3.6"
+        ]
+      },
+      "examples/anthropic-search": {
+        "dependencies": [
+          "jsr:@hono/hono@^4.11.7",
+          "jsr:@std/assert@^1.0.17",
+          "npm:@anthropic-ai/sdk@0.78",
           "npm:zod@^4.3.6"
         ]
       },
