@@ -16,7 +16,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-export const TOOL_MODEL = "claude-sonnet-4-6";
+export const TOOL_MODEL = "claude-haiku-4-5-20251001";
 
 let _client: Anthropic | null = null;
 
@@ -73,7 +73,7 @@ export async function webSearch(query: string): Promise<WebToolResult> {
     model: TOOL_MODEL,
     max_tokens: 4096,
     tools: [
-      { type: "web_search_20260209", name: "web_search", max_uses: 1 },
+      { type: "web_search_20260209", name: "web_search", max_uses: 1, allowed_callers: ["direct"] },
     ],
     messages: [
       {
@@ -107,7 +107,7 @@ export async function webFetch(url: string): Promise<WebToolResult> {
     model: TOOL_MODEL,
     max_tokens: 8192,
     tools: [
-      { type: "web_fetch_20260209", name: "web_fetch", max_uses: 1 },
+      { type: "web_fetch_20260209", name: "web_fetch", max_uses: 1, allowed_callers: ["direct"] },
     ],
     messages: [
       {
