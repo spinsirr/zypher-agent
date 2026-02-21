@@ -73,7 +73,7 @@ export async function webSearch(query: string): Promise<WebToolResult> {
     model: TOOL_MODEL,
     max_tokens: 4096,
     tools: [
-      { type: "web_search_20260209", name: "web_search", max_uses: 3 },
+      { type: "web_search_20260209", name: "web_search", max_uses: 1 },
     ],
     messages: [
       {
