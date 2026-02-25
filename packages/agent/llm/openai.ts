@@ -125,6 +125,10 @@ export class OpenAIModelProvider implements ModelProvider {
       const emittedToolCalls = new Set<string>();
       // Track tool call ids from raw chunks (index -> id mapping)
       const toolCallIds = new Map<number, string>();
+      // Track tool call ids by name for providers that don't send index (e.g. Gemini)
+      const toolCallIdsByName = new Map<string, string>();
+      // Auto-incrementing index for providers that don't send index
+      let nextAutoIndex = 0;
 
       stream.on("content.delta", (event) => {
         subscriber.next({ type: "text", content: event.delta });
@@ -133,10 +137,16 @@ export class OpenAIModelProvider implements ModelProvider {
       stream.on("chunk", (chunk) => {
         const toolCalls = chunk.choices[0]?.delta?.tool_calls;
         if (toolCalls) {
-          for (const tc of toolCalls) {
-            // Note: tc.index can be 0
-            if (tc.id && tc.index !== undefined) {
-              toolCallIds.set(tc.index, tc.id);
+          for (let i = 0; i < toolCalls.length; i++) {
+            const tc = toolCalls[i];
+            // Fall back to array position when index is missing (Gemini compatibility)
+            const index = tc.index ?? i;
+            if (tc.id) {
+              toolCallIds.set(index, tc.id);
+              // Also store by name for providers that omit index in delta events
+              if (tc.function?.name) {
+                toolCallIdsByName.set(tc.function.name, tc.id);
+              }
             }
           }
         }
@@ -145,17 +155,22 @@ export class OpenAIModelProvider implements ModelProvider {
       // Listen for tool call deltas
       stream.on("tool_calls.function.arguments.delta", (event) => {
         const toolName = event.name;
-        const toolIndex = event.index;
+        // Fall back to auto-index when index is missing (Gemini compatibility)
+        const toolIndex = event.index ?? nextAutoIndex;
 
         // Use index as the unique identifier for this tool call
         const toolKey = `${toolIndex}`;
 
-        // Get the tool call id from our mapping
-        const toolUseId = toolCallIds.get(toolIndex) ?? `fallback_${toolIndex}`;
+        // Get the tool call id from our mapping, trying index first, then name
+        const toolUseId = toolCallIds.get(toolIndex) ??
+          toolCallIdsByName.get(toolName) ??
+          `fallback_${toolIndex}`;
 
         // Emit initial tool_use event when we first see this tool call
         if (!emittedToolCalls.has(toolKey)) {
           emittedToolCalls.add(toolKey);
+          // Advance auto-index for next tool call
+          nextAutoIndex = toolIndex + 1;
           subscriber.next({
             type: "tool_use",
             toolUseId,
